@@ -12,8 +12,22 @@ BitcoinExchange::BitcoinExchange(std::string filename) {
 	getUserPrices(filename);
 }
 
+BitcoinExchange::BitcoinExchange(const BitcoinExchange &copy) {
+    *this = copy;
+}
+
+BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &copy) {
+    if (this != &copy) {
+        _btc = copy._btc;
+        _userPurchases = copy._userPurchases;
+    }
+    return *this;
+}
 
 BitcoinExchange::~BitcoinExchange(void) {
+    _btc.clear();
+    _userPurchases.clear();
+    std::cout << "Destructor called" << std::endl;
 }
 
 
@@ -75,6 +89,8 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 	while (std::getline(file, line)) {
 		size_t pipePos = line.find('|');
 		if (pipePos == std::string::npos) {
+            std::cerr << "Invalid separator format at line: " << line << std::endl;
+			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 			continue;
 		}
 		std::string date = line.substr(0, pipePos - 1);
@@ -105,7 +121,7 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 					}
 				}
 				if (!isValidPrice || std::stof(price) < 0 || std::stof(price) > 1000) {
-					std::cerr << "Invalid price value at line: " << line << " (price: " << price << ")" << std::endl;
+					std::cerr << "Invalid price value at line: " << line << std::endl;
 					std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 					continue;
 				}
@@ -116,7 +132,7 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 				std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 				continue;
 			}
-			_userPrices.push_back(data);
+			_userPurchases.push_back(data);
 		} catch (const std::invalid_argument& e) {
 			std::cerr << "Error: Invalid argument in stof at line: " << line << std::endl;
 			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
@@ -134,9 +150,9 @@ bool comparePriceData(const PriceData& data, const std::string& date) {
 }
 
 void BitcoinExchange::userPurchases(void) {
-    for (int i = 0; i < _userPrices.size(); ++i) {
+    for (int i = 0; i < _userPurchases.size(); ++i) {
         // Obtener el iterador al precio de btc en la fecha más cercana desde abajo a la fecha de compra
-        std::vector<PriceData>::iterator it = std::lower_bound(_btc.begin(), _btc.end(), _userPrices[i]._date, comparePriceData);
+        std::vector<PriceData>::iterator it = std::lower_bound(_btc.begin(), _btc.end(), _userPurchases[i]._date, comparePriceData);
 
         // Si no se encuentra la fecha porque es demasiado actual, se toma el precio más actual
         if (it == _btc.end()) {
@@ -147,18 +163,18 @@ void BitcoinExchange::userPurchases(void) {
         }
 
         // Calcular el valor de la compra en la fecha correspondiente
-        double result = it->_price * _userPrices[i]._price;
+        double result = it->_price * _userPurchases[i]._price;
 
         // Imprimir la fecha
-        std::cout << _userPrices[i]._date << " => ";
+        std::cout << _userPurchases[i]._date << " => ";
 
         // Comprobar si el precio del usuario es un número entero
-        if (_userPrices[i]._price == static_cast<int>(_userPrices[i]._price)) {
+        if (_userPurchases[i]._price == static_cast<int>(_userPurchases[i]._price)) {
             // Si es entero, imprimirlo como tal
-            std::cout << static_cast<int>(_userPrices[i]._price);
+            std::cout << static_cast<int>(_userPurchases[i]._price);
         } else {
             // Si tiene decimales, imprimirlo con precisión fija
-            std::cout << std::fixed << std::setprecision(2) << _userPrices[i]._price;
+            std::cout << std::fixed << std::setprecision(2) << _userPurchases[i]._price;
         }
 
         std::cout << " = ";
