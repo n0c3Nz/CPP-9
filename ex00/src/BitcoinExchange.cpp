@@ -30,7 +30,6 @@ BitcoinExchange::~BitcoinExchange(void) {
     std::cout << "Destructor called" << std::endl;
 }
 
-
 void BitcoinExchange::getDB(void){
     std::ifstream file("db/data.csv");
     if (!file.is_open()) {
@@ -42,7 +41,6 @@ void BitcoinExchange::getDB(void){
     std::getline(file, line);
 
     while (std::getline(file, line)) {
-        // Asegurarse de que la línea tiene al menos una coma
         size_t commaPos = line.find(',');
         if (commaPos == std::string::npos) {
             continue; // Saltar líneas sin coma
@@ -51,21 +49,14 @@ void BitcoinExchange::getDB(void){
         std::string date = line.substr(0, commaPos);
         std::string price = line.substr(commaPos + 1);
 
-        // Verificar si el valor de precio es válido antes de intentar convertirlo
         try {
-            PriceData data;
-            data._date = date;
-
-            // Asegurarse de que la cadena price no esté vacía y tenga formato adecuado
             if (!price.empty()) {
-                data._price = std::stof(price);
+                _btc[date] = std::stof(price); // Usamos std::map aquí
             } else {
                 std::cerr << "Invalid price format at line: " << line << std::endl;
 				std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
                 continue;
             }
-
-            _btc.push_back(data);
         } catch (const std::invalid_argument& e) {
             std::cerr << "Error: Invalid argument in stof at line: " << line << std::endl;
 			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
@@ -94,24 +85,9 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 			continue;
 		}
 		std::string date = line.substr(0, pipePos - 1);
-		// Check if the date has the correct format (YYYY-MM-DD)
-		if (date.size() != 10 || date[4] != '-' || date[7] != '-') {
-			std::cerr << "Invalid date format at line: " << line << std::endl;
-			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
-			continue;
-		}
-		// Check if the date is valid
-		if (std::stoi(date.substr(5, 2)) > 12 || std::stoi(date.substr(8, 2)) > 31) {
-			std::cerr << "Invalid date at line: " << line << std::endl;
-			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
-			continue;
-		}
 		std::string price = line.substr(pipePos + 2);
 		try {
-			PriceData data;
-			data._date = date;
 			if (!price.empty()) {
-				// Check if the price is a valid positive int or float
 				bool isValidPrice = true;
 				for (size_t i = 0; i < price.length(); ++i) {
 					char c = price[i];
@@ -126,13 +102,12 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 					continue;
 				}
 
-				data._price = std::stof(price);
+				_userPurchases[date] = std::stof(price); // Usamos std::map aquí
 			} else {
 				std::cerr << "Invalid price format at line: " << line << std::endl;
 				std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 				continue;
 			}
-			_userPurchases.push_back(data);
 		} catch (const std::invalid_argument& e) {
 			std::cerr << "Error: Invalid argument in stof at line: " << line << std::endl;
 			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
@@ -145,46 +120,37 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 	}
 }
 
-bool comparePriceData(const PriceData& data, const std::string& date) {
-    return data._date < date;
-}
-
 void BitcoinExchange::userPurchases(void) {
-    for (int i = 0; i < _userPurchases.size(); ++i) {
-        // Obtener el iterador al precio de btc en la fecha más cercana desde abajo a la fecha de compra
-        std::vector<PriceData>::iterator it = std::lower_bound(_btc.begin(), _btc.end(), _userPurchases[i]._date, comparePriceData);
+    std::map<std::string, float>::iterator it;
+    std::map<std::string, float>::iterator purchase_it;
 
-        // Si no se encuentra la fecha porque es demasiado actual, se toma el precio más actual
+    for (purchase_it = _userPurchases.begin(); purchase_it != _userPurchases.end(); ++purchase_it) {
+        it = _btc.lower_bound(purchase_it->first);
+        
         if (it == _btc.end()) {
-            it = _btc.end() - 1;
-        }
-        else {
-            --it;  // Esto es para coger el precio de la fecha más cercana desde abajo
+            it = --_btc.end();
+        } else if (it != _btc.begin()) {
+            --it; // Para tomar la fecha más cercana desde abajo
         }
 
-        // Calcular el valor de la compra en la fecha correspondiente
-        double result = it->_price * _userPurchases[i]._price;
+        double result = it->second * purchase_it->second;
 
         // Imprimir la fecha
-        std::cout << _userPurchases[i]._date << " => ";
+        std::cout << purchase_it->first << " => ";
 
         // Comprobar si el precio del usuario es un número entero
-        if (_userPurchases[i]._price == static_cast<int>(_userPurchases[i]._price)) {
-            // Si es entero, imprimirlo como tal
-            std::cout << static_cast<int>(_userPurchases[i]._price);
+        if (purchase_it->second == static_cast<int>(purchase_it->second)) {
+            std::cout << static_cast<int>(purchase_it->second);
         } else {
-            // Si tiene decimales, imprimirlo con precisión fija
-            std::cout << std::fixed << std::setprecision(2) << _userPurchases[i]._price;
+            std::cout << std::fixed << std::setprecision(2) << purchase_it->second;
         }
 
         std::cout << " = ";
 
-        // Comprobar si el resultado es efectivamente un número entero
+        // Comprobar si el resultado es un número entero
         if (result == static_cast<int>(result)) {
-            // Si es entero, imprimirlo como tal
             std::cout << static_cast<int>(result) << std::endl;
         } else {
-            // Si tiene decimales, imprimirlo con precisión fija
             std::cout << std::fixed << std::setprecision(2) << result << std::endl;
         }
     }

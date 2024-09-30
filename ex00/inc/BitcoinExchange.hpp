@@ -4,20 +4,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <algorithm>
-#include <functional>
+#include <map>
 #include <iomanip>
-
-struct PriceData {
-    float _price;
-    std::string _date;
-};
 
 class BitcoinExchange {
 	private:
-		std::vector<PriceData> _btc;
-		std::vector<PriceData> _userPurchases;
+		std::map<std::string, float> _btc;
+		std::map<std::string, float> _userPurchases;
 		void getDB(void);
 		void getUserPrices(std::string filename);
 	public:
@@ -27,8 +20,6 @@ class BitcoinExchange {
 		BitcoinExchange &operator=(const BitcoinExchange &copy);
 		~BitcoinExchange(void);
 		void userPurchases(void);
-
-
 };
 
 #endif
