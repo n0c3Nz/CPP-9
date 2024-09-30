@@ -1,21 +1,13 @@
-#ifndef RPN_HPP
-#define RPN_HPP
-
-#include <vector>
-#include <iostream>
-#include <algorithm>
+#include "RPN.hpp"
 
 
-class Rpn {
-	private:
-		std::vector<int> _operand;
-		std::vector<char> _operator;
-	public:
-		Rpn(void);//Default Constructor
-		Rpn(std::vector<int> _operand, std::vector<char>operator);//Parameter Constructor
-		Rpn
+int main(int argc, char **argv){
+	if (argc != 2)
+	{
+		std::cerr << "Invalid number of arguments" << std::endl;
+		return 1;
+	}
 
-};
-
-
-#endif
+	Rpn::calculate(argv[1]);
+	return 0;
+}
