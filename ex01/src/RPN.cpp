@@ -53,3 +53,8 @@ const char	*Rpn::InvalidArgument::what() const throw()
 	return ("Invalid Arguments");
 }
 
+const char	*Rpn::InvalidOperation::what() const throw()
+{
+	return ("Invalid Operation");
+}
+

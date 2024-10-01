@@ -20,6 +20,11 @@ class Rpn {
 			public:
 				virtual const char *what() const throw();
 		};
+		class InvalidOperation : public std::exception
+		{
+			public:
+				virtual const char *what() const throw();
+		};
 		~Rpn();
 		static int calculate(char *operation){
 			try {
@@ -42,38 +47,42 @@ class Rpn {
 					}
 					else if (*it == '+'){
 						if (stack.size() < 2)
-							throw InvalidArgument();
+							throw InvalidOperation();
 						int a = stack.top();
 						stack.pop();
 						int b = stack.top();
 						stack.pop();
+						//std::cout << a << " + " << b << " = " << a + b << std::endl;
 						stack.push(a + b);
 					}
 					else if (*it == '-'){
 						if (stack.size() < 2)
-							throw InvalidArgument();
+							throw InvalidOperation();
 						int a = stack.top();
 						stack.pop();
 						int b = stack.top();
 						stack.pop();
+						//std::cout << a << " - " << b << " = " << a - b << std::endl;
 						stack.push(b - a);
 					}
 					else if (*it == '*'){
 						if (stack.size() < 2)
-							throw InvalidArgument();
+							throw InvalidOperation();
 						int a = stack.top();
 						stack.pop();
 						int b = stack.top();
 						stack.pop();
+						//std::cout << a << " * " << b << " = " << a * b << std::endl;
 						stack.push(a * b);
 					}
 					else if (*it == '/'){
 						if (stack.size() < 2)
-							throw InvalidArgument();
+							throw InvalidOperation();
 						int a = stack.top();
 						stack.pop();
 						int b = stack.top();
 						stack.pop();
+						//std::cout << b << " / " << a << " = " << b / a << std::endl;
 						stack.push(b / a);
 					}
 					else if (*it != ' '){
@@ -102,6 +111,9 @@ class Rpn {
 
 (42 * 2) / 4 - 2 + 3 = 19
 42 * 2 = 84 / 4 = 21 | 3 + 2 = 5 | 21 - 5 = 16
+
+7 + (4 * 2) / 3 - 5 * 9 =
+7 4 2 * + 6 3 / - 5 * 9 +
 */
 
 #endif
