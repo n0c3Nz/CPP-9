@@ -96,13 +96,10 @@ class Rpn {
 				return stack.top();
 			}
 			catch (std::exception &e){
-				std::cerr << e.what() << std::endl;
+				std::cout << e.what() << std::endl;
 				return -1;
 			}
 		}
-
-		
-
 };
 
 /*

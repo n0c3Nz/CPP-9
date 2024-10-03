@@ -53,17 +53,17 @@ void BitcoinExchange::getDB(void){
             if (!price.empty()) {
                 _btc[date] = std::stof(price); // Usamos std::map aquí
             } else {
-                std::cerr << "Invalid price format at line: " << line << std::endl;
-				std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+                std::cout << "Invalid price format at line: " << line << std::endl;
+				std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
                 continue;
             }
         } catch (const std::invalid_argument& e) {
-            std::cerr << "Error: Invalid argument in stof at line: " << line << std::endl;
-			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+            std::cout << "Error: Invalid argument in stof at line: " << line << std::endl;
+			std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
             continue;
         } catch (const std::out_of_range& e) {
-            std::cerr << "Error: Value out of range in stof at line: " << line << std::endl;
-			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+            std::cout << "Error: Value out of range in stof at line: " << line << std::endl;
+			std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
             continue;
         }
     }
@@ -80,8 +80,8 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 	while (std::getline(file, line)) {
 		size_t pipePos = line.find('|');
 		if (pipePos == std::string::npos) {
-            std::cerr << "Invalid separator format at line: " << line << std::endl;
-			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+            std::cout << "Invalid separator format at line: " << line << std::endl;
+			std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 			continue;
 		}
 		std::string date = line.substr(0, pipePos - 1);
@@ -97,24 +97,24 @@ void BitcoinExchange::getUserPrices(std::string filename) {
 					}
 				}
 				if (!isValidPrice || std::stof(price) < 0 || std::stof(price) > 1000) {
-					std::cerr << "Invalid price value at line: " << line << std::endl;
-					std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+					std::cout << "Invalid price value at line: " << line << std::endl;
+					std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 					continue;
 				}
 
 				_userPurchases[date] = std::stof(price); // Usamos std::map aquí
 			} else {
-				std::cerr << "Invalid price format at line: " << line << std::endl;
-				std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+				std::cout << "Invalid price format at line: " << line << std::endl;
+				std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 				continue;
 			}
 		} catch (const std::invalid_argument& e) {
-			std::cerr << "Error: Invalid argument in stof at line: " << line << std::endl;
-			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+			std::cout << "Error: Invalid argument in stof at line: " << line << std::endl;
+			std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 			continue;
 		} catch (const std::out_of_range& e) {
-			std::cerr << "Error: Value out of range in stof at line: " << line << std::endl;
-			std::cerr << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
+			std::cout << "Error: Value out of range in stof at line: " << line << std::endl;
+			std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
 			continue;
 		}
 	}
