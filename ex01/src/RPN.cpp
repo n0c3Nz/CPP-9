@@ -23,6 +23,14 @@ Rpn::~Rpn() {
 	std::cout << "Destructor" << std::endl;
 }
 
+int strlen(char *operation){
+	int i = 0;
+	while (operation[i] != '\0'){
+		i++;
+	}
+	return i;
+}
+
 int Rpn::isAOperation(char *operation){
 	bool space = true;
 	int numbers = 0;

@@ -60,7 +60,7 @@ void BitcoinExchange::getDB(void){
         } catch (const std::invalid_argument& e) {
             std::cout << "Error: Invalid argument in stof at line: " << line << std::endl;
 			std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;
-            continue;
+            continue; 
         } catch (const std::out_of_range& e) {
             std::cout << "Error: Value out of range in stof at line: " << line << std::endl;
 			std::cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" << std::endl;

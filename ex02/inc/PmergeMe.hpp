@@ -8,18 +8,17 @@
 #include <string>
 #include <ctime>
 
-
 class Pmergeme {
 	private:
 		std::vector<int> _nbrs;
 		std::list<int> _left;
 		std::vector<int> _right;
-		std::chrono::high_resolution_clock::time_point _rstart;
-		std::chrono::high_resolution_clock::time_point _rend;
-		std::chrono::duration<double> _relapsed;
-		std::chrono::high_resolution_clock::time_point _lstart;
-		std::chrono::high_resolution_clock::time_point _lend;
-		std::chrono::duration<double> _lelapsed;
+		std::clock_t _rstart;
+		std::clock_t _rend;
+		double _relapsed;
+		std::clock_t _lstart;
+		std::clock_t _lend;
+		double _lelapsed;
 		int _ls;
 		int _rs;
 		bool _r;
@@ -28,13 +27,11 @@ class Pmergeme {
 		void fordJohnsonSort(std::vector<int>& arr, int l, int r);
 	public:
 		Pmergeme();
-		Pmergeme(std::string nbrs);//parametros
+		Pmergeme(std::string nbrs);
 		Pmergeme(const Pmergeme &copy);
 		Pmergeme &operator=(const Pmergeme &copy);
 		~Pmergeme();
 		void sort();
 };
-
-
 
 #endif
